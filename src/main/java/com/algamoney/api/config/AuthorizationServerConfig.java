@@ -71,6 +71,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      * Poderia tambem informar ao na configuração do client para usar esse encoder com '{noop}angular'.
      * Ou entao seria necessario codificar o password dos clients para bcrypt
      * Ver: https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#oauth-2-0-client-support
+     * https://stackoverflow.com/a/49141956
      *
      */
     @Override
