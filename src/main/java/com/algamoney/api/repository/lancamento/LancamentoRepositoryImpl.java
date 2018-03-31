@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -24,20 +26,23 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery {
     private EntityManager entityManager;
 
     @Override
-    public Page<Lancamento> filtrar(LancamentoFilter lancamentoFilter, Pageable pageable) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Lancamento> criteriaQuery = builder.createQuery(Lancamento.class);
+    public Mono<? extends  Page<Lancamento>> filtrar(LancamentoFilter lancamentoFilter, Pageable pageable) {
+        return Mono.defer(() -> {
+            CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+            CriteriaQuery<Lancamento> criteriaQuery = builder.createQuery(Lancamento.class);
 
-        Root<Lancamento> root = criteriaQuery.from(Lancamento.class);
+            Root<Lancamento> root = criteriaQuery.from(Lancamento.class);
 
-        Predicate[] predicates = criarRestricoes(lancamentoFilter, builder, root);
-        criteriaQuery.where(predicates);
+            Predicate[] predicates = criarRestricoes(lancamentoFilter, builder, root);
+            criteriaQuery.where(predicates);
 
-        TypedQuery<Lancamento> query = entityManager.createQuery(criteriaQuery);
+            TypedQuery<Lancamento> query = entityManager.createQuery(criteriaQuery);
 
-        adicionarRestricoesPaginacao(pageable, query);
+            adicionarRestricoesPaginacao(pageable, query);
 
-        return new PageImpl<Lancamento>(query.getResultList(), pageable, total(lancamentoFilter));
+            return Mono.just(new PageImpl<Lancamento>(query.getResultList(), pageable, total(lancamentoFilter)));
+        }).subscribeOn(Schedulers.immediate())
+          .log();
     }
 
     @Override
