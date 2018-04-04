@@ -28,17 +28,21 @@ public class CategoriaRepositoryReactive implements ReactiveCrudRepository<Categ
 
     @Override
     public <S extends Categoria> Flux<S> saveAll(Iterable<S> entities) {
-        return null;
+        return Flux.defer(() -> Flux.fromIterable(categoriaRepository.saveAll(entities)))
+                .subscribeOn(scheduler)
+                .log();
+
     }
 
     @Override
     public <S extends Categoria> Flux<S> saveAll(Publisher<S> entityStream) {
-        return null;
+        return saveAll(Flux.from(entityStream).toIterable());
     }
 
     @Override
-    public Mono<Categoria> findById(Long aLong) {
-        return null;
+    public Mono<Categoria> findById(Long id) {
+        return Mono.defer(() -> Mono.justOrEmpty(categoriaRepository.findById(id)))
+                .subscribeOn(scheduler);
     }
 
     @Override
