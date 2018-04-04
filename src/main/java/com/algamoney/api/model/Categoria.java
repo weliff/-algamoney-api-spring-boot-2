@@ -20,6 +20,14 @@ public class Categoria {
 	@Size(min = 3, max = 20)
 	private String nome;
 
+	public Categoria(Long codigo, String nome) {
+		this.codigo = codigo;
+		this.nome = nome;
+	}
+
+	public Categoria() {
+	}
+
 	public Long getCodigo() {
 		return codigo;
 	}
