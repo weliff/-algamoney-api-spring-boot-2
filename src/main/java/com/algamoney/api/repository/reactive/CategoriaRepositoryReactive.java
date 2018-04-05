@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class CategoriaRepositoryReactive extends GenericoRepositoryReactive<Categoria, Long> {
 
-    private CategoriaRepository categoriaRepository;
-
     public CategoriaRepositoryReactive(CategoriaRepository categoriaRepository) {
         super(categoriaRepository);
     }
