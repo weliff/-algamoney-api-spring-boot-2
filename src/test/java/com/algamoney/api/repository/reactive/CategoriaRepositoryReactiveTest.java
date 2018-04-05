@@ -88,4 +88,41 @@ public class CategoriaRepositoryReactiveTest extends BaseReactiveRepositoryTest 
 
 
     }
+
+    @Test
+    public void deveVerificarSeExisteCategoriaPorId() throws Exception {
+        Categoria categoria = new Categoria(null, "Nova categoria 1");
+
+        Mono<Boolean> categoriaMono = categoriaRepositoryReactive.save(categoria)
+                .flatMap(c -> categoriaRepositoryReactive.existsById(c.getCodigo()));
+
+        StepVerifier.create(categoriaMono)
+                .expectNext(true)
+                .verifyComplete();
+    }
+
+    @Test
+    public void deveVerificarSeExisteCategoriaPorIdQuandoNaoExistir() throws Exception {
+
+        Mono<Boolean> categoriaMono =  categoriaRepositoryReactive.existsById(100L);
+
+        StepVerifier.create(categoriaMono)
+                .expectNext(false)
+                .verifyComplete();
+    }
+
+    @Test
+    public void deveVerificarSeExisteCategoriaPorIdPublisher() throws Exception {
+        Categoria categoria = new Categoria(null, "Nova categoria 1");
+
+        Mono<Boolean> categoriaMono = categoriaRepositoryReactive.save(categoria)
+                .map(c -> Mono.just(c.getCodigo()))
+                .flatMap(codigo -> categoriaRepositoryReactive.existsById(codigo));
+
+        StepVerifier.create(categoriaMono)
+                .expectNext(true)
+                .verifyComplete();
+    }
+
+
 }

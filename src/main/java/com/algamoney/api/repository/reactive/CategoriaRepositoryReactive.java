@@ -47,66 +47,84 @@ public class CategoriaRepositoryReactive implements ReactiveCrudRepository<Categ
 
     @Override
     public Mono<Categoria> findById(Publisher<Long> id) {
-        return null;
+        return Mono.from(id).flatMap(this::findById);
     }
 
     @Override
-    public Mono<Boolean> existsById(Long aLong) {
-        return null;
+    public Mono<Boolean> existsById(Long id) {
+        return Mono.defer(() -> Mono.just(categoriaRepository.existsById(id)))
+                .subscribeOn(scheduler);
     }
 
     @Override
     public Mono<Boolean> existsById(Publisher<Long> id) {
-        return null;
+        return Mono.from(id)
+                .flatMap(this::existsById);
     }
 
     @Override
     public Flux<Categoria> findAll() {
-        return null;
+        return Flux.defer(() -> Flux.fromIterable(categoriaRepository.findAll()))
+                .subscribeOn(scheduler);
     }
 
     @Override
     public Flux<Categoria> findAllById(Iterable<Long> longs) {
-        return null;
+        return Flux.defer(() -> Flux.fromIterable(categoriaRepository.findAllById(longs)))
+                .subscribeOn(scheduler);
     }
 
     @Override
     public Flux<Categoria> findAllById(Publisher<Long> idStream) {
-        return null;
+        return findAllById(Flux.from(idStream).toIterable());
     }
 
     @Override
     public Mono<Long> count() {
-        return null;
+        return Mono.defer(() -> Mono.just(categoriaRepository.count()))
+                .subscribeOn(scheduler);
     }
 
     @Override
     public Mono<Void> deleteById(Long aLong) {
-        return null;
+        return Mono.defer(() -> {
+            categoriaRepository.deleteById(aLong);
+            return Mono.empty();
+        }).subscribeOn(scheduler).then();
     }
 
     @Override
     public Mono<Void> deleteById(Publisher<Long> id) {
-        return null;
+        return Mono.just(id)
+                .flatMap(this::deleteById);
     }
 
     @Override
     public Mono<Void> delete(Categoria entity) {
-        return null;
+        return Mono.defer(() -> {
+            categoriaRepository.delete(entity);
+            return Mono.empty();
+        }).subscribeOn(scheduler).then();
     }
 
     @Override
     public Mono<Void> deleteAll(Iterable<? extends Categoria> entities) {
-        return null;
+        return Mono.defer(() -> {
+            categoriaRepository.deleteAll(entities);
+            return Mono.empty();
+        }).subscribeOn(scheduler).then();
     }
 
     @Override
     public Mono<Void> deleteAll(Publisher<? extends Categoria> entityStream) {
-        return null;
+        return deleteAll(Flux.from(entityStream).toIterable());
     }
 
     @Override
     public Mono<Void> deleteAll() {
-        return null;
+        return Mono.defer(() -> {
+            categoriaRepository.deleteAll();
+            return Mono.empty();
+        }).subscribeOn(scheduler).then();
     }
 }
